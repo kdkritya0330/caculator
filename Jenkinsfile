@@ -1,35 +1,23 @@
 pipeline {
     agent any
-
-    environment {
-        DOCKER_IMAGE = "<your-dockerhub-username>/calculator:latest"
-    }
-
     stages {
-        stage('Clone') {
-            steps {
-                git url: 'https://github.com/kdkritya0330/caculator', branch: 'main'
-            }
-        }
-
-        stage('Install dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh 'docker build -t calculator .'
             }
         }
-
-        stage('Push to DockerHub') {
+        stage('Push Docker Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh 'docker push $DOCKER_IMAGE'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+                    sh 'docker tag calculator $USERNAME/calculator'
+                    sh 'docker push $USERNAME/calculator'
                 }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh 'kubectl apply -f k8s/'
             }
         }
     }
