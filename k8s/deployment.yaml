@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: calculator
-        image: <your-dockerhub-username>/calculator:latest
+        image: yourdockerhubusername/calculator
         ports:
-        - containerPort: 3000
+        - containerPort: 80

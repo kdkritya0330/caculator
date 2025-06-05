@@ -3,11 +3,10 @@ kind: Service
 metadata:
   name: calculator-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: calculator
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 3000
-      nodePort: 31000
+  - protocol: TCP
+    port: 80
+    targetPort: 80
